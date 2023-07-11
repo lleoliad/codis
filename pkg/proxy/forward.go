@@ -33,6 +33,7 @@ func (d *forwardSync) GetId() int {
 }
 
 func (d *forwardSync) Forward(s *Slot, r *Request, hkey []byte) error {
+	log.Infof("forwardSync Forward -------- inteverl: %d", time.Since(r.Time).Milliseconds())
 	s.lock.RLock()
 	bc, err := d.process(s, r, hkey)
 	s.lock.RUnlock()
@@ -70,6 +71,7 @@ func (d *forwardSemiAsync) GetId() int {
 }
 
 func (d *forwardSemiAsync) Forward(s *Slot, r *Request, hkey []byte) error {
+	log.Infof("forwardSemiAsync Forward -------- inteverl: %d", time.Since(r.Time).Milliseconds())
 	var loop int
 	for {
 		s.lock.RLock()
