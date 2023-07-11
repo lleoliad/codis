@@ -9,6 +9,7 @@ import (
 	"unsafe"
 
 	"github.com/CodisLabs/codis/pkg/proxy/redis"
+	"github.com/CodisLabs/codis/pkg/utils/log"
 	"github.com/CodisLabs/codis/pkg/utils/sync2/atomic2"
 )
 
@@ -149,10 +150,12 @@ func (c *RequestChan) IsEmpty() bool {
 func (c *RequestChan) PopFrontAll(onRequest func(r *Request) error) error {
 	for {
 		r, ok := c.PopFront()
+		log.Infof("RequestChan PopFrontAll -------- Pop inteverl: %d", time.Since(r.Time).Milliseconds())
 		if ok {
 			if err := onRequest(r); err != nil {
 				return err
 			}
+			log.Infof("RequestChan PopFrontAll -------- Over inteverl: %d", time.Since(r.Time).Milliseconds())
 		} else {
 			return nil
 		}

@@ -135,7 +135,7 @@ func (s *Session) Start(d *Router) {
 			return
 		}
 
-		tasks := NewRequestChanBuffer(10240)
+		tasks := NewRequestChanBuffer(1024)
 
 		go func() {
 			s.loopWriter(tasks)
@@ -182,6 +182,7 @@ func (s *Session) loopReader(tasks *RequestChan, d *Router) (err error) {
 		r.Batch = &sync.WaitGroup{}
 		r.Database = s.database
 		r.UnixNano = start.UnixNano()
+		r.Time = start
 
 		if err := s.handleRequest(r, d); err != nil {
 			r.Resp = redis.NewErrorf("ERR handle request, %s", err)
