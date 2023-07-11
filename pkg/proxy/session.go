@@ -186,12 +186,14 @@ func (s *Session) loopReader(tasks *RequestChan, d *Router) (err error) {
 		if err := s.handleRequest(r, d); err != nil {
 			r.Resp = redis.NewErrorf("ERR handle request, %s", err)
 			tasks.PushBack(r)
-			log.Infof("session [%p] reader request err inteverl: %.6f", s, float64(time.Since(start)))
+			// log.Infof("session [%p] reader request err inteverl: %.6f", s, float64(time.Since(start)))
+			log.Infof("session [%p] reader request err inteverl: %d", s, time.Since(start).Milliseconds())
 			if breakOnFailure {
 				return err
 			}
 		} else {
-			log.Infof("session [%p] reader request success inteverl: %.6f", s, float64(time.Since(start)))
+			// log.Infof("session [%p] reader request success inteverl: %.6f", s, float64(time.Since(start).Milliseconds()))
+			log.Infof("session [%p] reader request success inteverl: %d", s, time.Since(start).Milliseconds())
 			tasks.PushBack(r)
 		}
 	}
@@ -237,6 +239,7 @@ func (s *Session) loopWriter(tasks *RequestChan) (err error) {
 		if fflush {
 			s.flushOpStats(false)
 		}
+		log.Infof("session [%p] reader response success inteverl: %d", s, (time.Now().UnixNano() - r.UnixNano))
 		return nil
 	})
 }
