@@ -248,12 +248,15 @@ func (s *Session) loopWriter(tasks *RequestChan) (err error) {
 }
 
 func (s *Session) handleResponse(r *Request) (*redis.Resp, error) {
+	wres := time.Now()
 	r.Batch.Wait()
+	log.Infof("session [%p] reader response wres inteverl: %d", s, time.Since(wres).Milliseconds())
 	if r.Coalesce != nil {
 		if err := r.Coalesce(); err != nil {
 			return nil, err
 		}
 	}
+	log.Infof("session [%p] reader response wres-o inteverl: %d", s, time.Since(wres).Milliseconds())
 	if err := r.Err; err != nil {
 		return nil, err
 	} else if r.Resp == nil {
