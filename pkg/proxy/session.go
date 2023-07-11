@@ -135,7 +135,7 @@ func (s *Session) Start(d *Router) {
 			return
 		}
 
-		tasks := NewRequestChanBuffer(1024)
+		tasks := NewRequestChanBuffer(10240)
 
 		go func() {
 			s.loopWriter(tasks)
@@ -182,20 +182,15 @@ func (s *Session) loopReader(tasks *RequestChan, d *Router) (err error) {
 		r.Batch = &sync.WaitGroup{}
 		r.Database = s.database
 		r.UnixNano = start.UnixNano()
-		r.Time = start
 
 		if err := s.handleRequest(r, d); err != nil {
 			r.Resp = redis.NewErrorf("ERR handle request, %s", err)
 			tasks.PushBack(r)
-			// log.Infof("session [%p] reader request err inteverl: %.6f", s, float64(time.Since(start)))
-			log.Infof("session [%p] reader request err inteverl: %d", s, time.Since(start).Milliseconds())
 			if breakOnFailure {
 				return err
 			}
 		} else {
-			// log.Infof("session [%p] reader request success inteverl: %.6f", s, float64(time.Since(start).Milliseconds()))
 			tasks.PushBack(r)
-			log.Infof("session [%p] reader request success inteverl: %d", s, time.Since(start).Milliseconds())
 		}
 	}
 	return nil
@@ -220,9 +215,7 @@ func (s *Session) loopWriter(tasks *RequestChan) (err error) {
 	p.MaxBuffered = maxPipelineLen / 2
 
 	return tasks.PopFrontAll(func(r *Request) error {
-		end := time.Now()
 		resp, err := s.handleResponse(r)
-		log.Infof("session [%p] reader response return inteverl: %d - %d", s, time.Since(end).Milliseconds(), time.Since(r.Time).Milliseconds())
 		if err != nil {
 			resp = redis.NewErrorf("ERR handle response, %s", err)
 			if breakOnFailure {
@@ -242,21 +235,17 @@ func (s *Session) loopWriter(tasks *RequestChan) (err error) {
 		if fflush {
 			s.flushOpStats(false)
 		}
-		log.Infof("session [%p] reader response success inteverl: %d - %d", s, time.Since(end).Milliseconds(), time.Since(r.Time).Milliseconds())
 		return nil
 	})
 }
 
 func (s *Session) handleResponse(r *Request) (*redis.Resp, error) {
-	wres := time.Now()
 	r.Batch.Wait()
-	log.Infof("session [%p] reader response wres inteverl: %d", s, time.Since(wres).Milliseconds())
 	if r.Coalesce != nil {
 		if err := r.Coalesce(); err != nil {
 			return nil, err
 		}
 	}
-	log.Infof("session [%p] reader response wres-o inteverl: %d", s, time.Since(wres).Milliseconds())
 	if err := r.Err; err != nil {
 		return nil, err
 	} else if r.Resp == nil {

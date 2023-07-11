@@ -75,6 +75,7 @@ func (bc *BackendConn) PushBack(r *Request) {
 	if r.Batch != nil {
 		r.Batch.Add(1)
 	}
+	log.Infof("BackendConn PushBack -------- inteverl: %d", time.Since(r.Time).Milliseconds())
 	bc.input <- r
 }
 
@@ -144,7 +145,7 @@ func (bc *BackendConn) KeepAlive() bool {
 	return true
 }
 
-var keepAliveCallback = make(chan func(), 10240)
+var keepAliveCallback = make(chan func(), 1280)
 
 func init() {
 	go func() {
