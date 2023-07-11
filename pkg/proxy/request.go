@@ -5,6 +5,7 @@ package proxy
 
 import (
 	"sync"
+	"time"
 	"unsafe"
 
 	"github.com/CodisLabs/codis/pkg/proxy/redis"
@@ -23,6 +24,7 @@ type Request struct {
 
 	Database int32
 	UnixNano int64
+	Time     time.Time
 
 	*redis.Resp
 	Err error

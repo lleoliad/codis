@@ -182,6 +182,7 @@ func (s *Session) loopReader(tasks *RequestChan, d *Router) (err error) {
 		r.Batch = &sync.WaitGroup{}
 		r.Database = s.database
 		r.UnixNano = start.UnixNano()
+		r.Time = start
 
 		if err := s.handleRequest(r, d); err != nil {
 			r.Resp = redis.NewErrorf("ERR handle request, %s", err)
@@ -219,6 +220,7 @@ func (s *Session) loopWriter(tasks *RequestChan) (err error) {
 	p.MaxBuffered = maxPipelineLen / 2
 
 	return tasks.PopFrontAll(func(r *Request) error {
+		end := time.Now()
 		resp, err := s.handleResponse(r)
 		if err != nil {
 			resp = redis.NewErrorf("ERR handle response, %s", err)
@@ -239,7 +241,7 @@ func (s *Session) loopWriter(tasks *RequestChan) (err error) {
 		if fflush {
 			s.flushOpStats(false)
 		}
-		log.Infof("session [%p] reader response success inteverl: %d", s, (time.Now().UnixNano() - r.UnixNano))
+		log.Infof("session [%p] reader response success inteverl: %d - %d", s, time.Since(end).Milliseconds(), time.Since(r.Time).Milliseconds())
 		return nil
 	})
 }
