@@ -222,6 +222,7 @@ func (s *Session) loopWriter(tasks *RequestChan) (err error) {
 	return tasks.PopFrontAll(func(r *Request) error {
 		end := time.Now()
 		resp, err := s.handleResponse(r)
+		log.Infof("session [%p] reader response return inteverl: %d - %d", s, time.Since(end).Milliseconds(), time.Since(r.Time).Milliseconds())
 		if err != nil {
 			resp = redis.NewErrorf("ERR handle response, %s", err)
 			if breakOnFailure {
