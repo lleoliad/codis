@@ -45,7 +45,7 @@ func NewBackendConn(addr string, database int, config *Config) *BackendConn {
 	bc := &BackendConn{
 		addr: addr, config: config, database: database,
 	}
-	bc.input = make(chan *Request, 1024)
+	bc.input = make(chan *Request, 10240)
 	bc.retry.delay = &DelayExp2{
 		Min: 50, Max: 5000,
 		Unit: time.Millisecond,

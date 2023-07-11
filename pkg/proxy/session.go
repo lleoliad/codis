@@ -194,8 +194,8 @@ func (s *Session) loopReader(tasks *RequestChan, d *Router) (err error) {
 			}
 		} else {
 			// log.Infof("session [%p] reader request success inteverl: %.6f", s, float64(time.Since(start).Milliseconds()))
-			log.Infof("session [%p] reader request success inteverl: %d", s, time.Since(start).Milliseconds())
 			tasks.PushBack(r)
+			log.Infof("session [%p] reader request success inteverl: %d", s, time.Since(start).Milliseconds())
 		}
 	}
 	return nil
