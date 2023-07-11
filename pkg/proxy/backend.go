@@ -144,7 +144,7 @@ func (bc *BackendConn) KeepAlive() bool {
 	return true
 }
 
-var keepAliveCallback = make(chan func(), 1280)
+var keepAliveCallback = make(chan func(), 10240)
 
 func init() {
 	go func() {
