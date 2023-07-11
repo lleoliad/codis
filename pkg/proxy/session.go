@@ -186,10 +186,12 @@ func (s *Session) loopReader(tasks *RequestChan, d *Router) (err error) {
 		if err := s.handleRequest(r, d); err != nil {
 			r.Resp = redis.NewErrorf("ERR handle request, %s", err)
 			tasks.PushBack(r)
+			log.Infof("session [%p] reader request err inteverl: %.6f", s, float64(time.Since(start)))
 			if breakOnFailure {
 				return err
 			}
 		} else {
+			log.Infof("session [%p] reader request success inteverl: %.6f", s, float64(time.Since(start)))
 			tasks.PushBack(r)
 		}
 	}
