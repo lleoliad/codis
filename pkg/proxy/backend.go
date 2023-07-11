@@ -246,6 +246,7 @@ func (bc *BackendConn) setResponse(r *Request, resp *redis.Resp, err error) erro
 	}
 	if r.Batch != nil {
 		r.Batch.Done()
+		log.Infof("BackendConn setResponse -------- inteverl: %d", time.Since(r.Time).Milliseconds())
 	}
 	return err
 }

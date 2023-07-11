@@ -283,6 +283,8 @@ func (s *Session) handleRequest(r *Request, d *Router) error {
 		s.authorized = true
 	}
 
+	log.Infof("session handleRequest -------- opstr: %s", opstr)
+
 	switch opstr {
 	case "SELECT":
 		return s.handleSelect(r)
